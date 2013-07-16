@@ -237,7 +237,7 @@ module Wrest
 
     http_request = double(Net::HTTP::Get, :method => "GET", :hash => {})
     http_request.should_receive(:basic_auth).with('ooga', 'bar')
-    request.should_receive(:http_request).any_number_of_times.and_return(http_request)
+    request.stub(:http_request).and_return(http_request)
     request.should_receive(:do_request).and_return(double(Net::HTTPOK, :code => "200", :message => 'OK', :body => '', :to_hash => {}))
              uri.get
           end
@@ -431,9 +431,9 @@ module Wrest
         uri = "http://localhost:3000/glassware".to_uri
 
         http = double(Net::HTTP)
-        Net::HTTP.should_receive(:new).with('localhost', 3000).any_number_of_times.and_return(http)
-        http.should_receive(:read_timeout=).any_number_of_times.with(60)
-        http.should_receive(:set_debug_output).any_number_of_times
+        Net::HTTP.stub(:new).with('localhost', 3000).and_return(http)
+        http.stub(:read_timeout=).with(60)
+        http.stub(:set_debug_output)
 
         request_get = Net::HTTP::Get.new('/glassware?owner=Kai&type=bottle', {'page' => '2', 'per_page' => '5'})
         Net::HTTP::Get.should_receive(:new).with('/glassware?owner=Kai&type=bottle', {'page' => '2', 'per_page' => '5'}).and_return(request_get)

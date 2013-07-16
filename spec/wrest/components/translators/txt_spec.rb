@@ -12,12 +12,12 @@ module Wrest::Components::Translators
     it "should return string version of any object when serialise" do
       Txt.serialise({"ooga"=>{"age" => "12"}}).should == "{\"ooga\"=>{\"age\"=>\"12\"}}"
     end
-    
+
     it "has #deserialize delegate to #deserialise" do
       Txt.should_receive(:deserialise).with(http_response, :option => :something)
       Txt.deserialize(http_response, :option => :something)
     end
-    
+
     it "has #serialize delegate to #serialise" do
       Txt.should_receive(:serialise).with({ :hash => :foo }, :option => :something)
       Txt.serialize({:hash => :foo}, :option => :something)

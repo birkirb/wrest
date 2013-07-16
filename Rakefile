@@ -47,7 +47,7 @@ namespace :rspec do
     ENV["wrest_functional_spec"] = "true"
     Rake::Task["rspec:spec_runner"].invoke
   end
-  
+
   RSpec::Core::RakeTask.new(:spec_runner) do |task|
     task.pattern = 'spec/wrest/**/*_spec.rb'
   end
@@ -91,7 +91,7 @@ namespace (:benchmark) do
 
     class Ooga < Wrest::Resource::Base
     end
-    class Booga < ActiveResource::Base 
+    class Booga < ActiveResource::Base
       self.site=''
     end
   end
@@ -217,8 +217,8 @@ namespace (:benchmark) do
         }
       end
     end
-  end  
-  
+  end
+
   desc "Benchmark keepalive connections (needs functional/sample_rails_app running with class-caching on and keep-alive enabled)"
   task :keep_alive => :setup_test_classes do
     n = 20
@@ -230,7 +230,7 @@ namespace (:benchmark) do
           'http://localhost:3000/lead_bottles.xml?owner=Kai&type=bottle'.to_uri.get
         }
       end
-      
+
       rpt.report("Keep-alive connection (Connection: Keep-Alive)") do
         Wrest::Native::Session.new('http://localhost:3000'.to_uri) do |session|
           n.times {
@@ -246,7 +246,7 @@ namespace (:benchmark) do
   task :deserialise_xml => :setup_test_classes do |t|
     n = 100
     puts "Deserialising using #{ActiveSupport::XmlMini.backend}"
-    
+
     Benchmark.bmbm(10) do |rpt|
       rpt.report("Hash.from_xml") do
         n.times {
@@ -255,7 +255,7 @@ namespace (:benchmark) do
       end
     end
   end
-    
+
   def serialised_data
       <<-EOXML
 <?xml version="1.0" encoding="UTF-8"?>

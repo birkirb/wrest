@@ -6,19 +6,19 @@ unless RUBY_PLATFORM =~ /java/
       context 'Aliased methods' do
         it "has #deserialize delegate to #deserialise" do
           response = Wrest::Curl::Response.new(double('Response', :headers => {'Content-type' => 'text/xml;charset=utf-8'}))
-          
+
           response.should_receive(:deserialise)
           response.deserialize
         end
 
         it "has #deserialize_using delegate to #deserialise_using" do
           response = Wrest::Curl::Response.new(double('Response', :headers => {'Content-type' => 'text/xml;charset=utf-8'}))
-          
+
           response.should_receive(:deserialise_using)
           response.deserialize_using
         end
       end
-      
+
       describe 'Headers' do
         it "should know how to retrieve content type irrespective of the casing" do
           http_response = double('Patron::Response')
@@ -32,27 +32,27 @@ unless RUBY_PLATFORM =~ /java/
         http_response = double('response')
         http_response.stub(:code).and_return('200')
         http_response.should_receive(:body).and_return(<<-EOJS
-        { 
+        {
           "menu": "File",
-          "commands": [ 
-            { "title": "New", "action":"CreateDoc" }, 
-            { "title": "Open", "action": "OpenDoc" }, 
-            { "title": "Close", "action": "CloseDoc" } 
-          ] 
+          "commands": [
+            { "title": "New", "action":"CreateDoc" },
+            { "title": "Open", "action": "OpenDoc" },
+            { "title": "Close", "action": "CloseDoc" }
+          ]
         }
 EOJS
 )
         http_response.should_receive(:content_type).and_return('application/json')
 
         response = Native::Response.new(http_response)
-    
+
         response.deserialise.should == { "commands"=>[{"title"=>"New",
               "action"=>"CreateDoc"},
               {"title"=>"Open","action"=>"OpenDoc"},{"title"=>"Close",
               "action"=>"CloseDoc"}], "menu"=>"File"}
       end
-     
-      
+
+
       describe "cache deserialised body" do
       it "should return the catched deserialised body when deserialise is called more than once" do
         http_response = double('curl response')
@@ -99,7 +99,7 @@ EOJS
             @response.content_length.should == 172
           end
         end
-        
+
         it "should handle headers with multiple values where the values are made available in an array" do
           response = Wrest::Curl::Request.new('http://localhost:3000/multiple_response_headers'.to_uri, :get).invoke
           response.code.should == 200

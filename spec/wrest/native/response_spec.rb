@@ -5,14 +5,14 @@ module Wrest
     context 'Aliased methods' do
       it "has #deserialize delegate to #deserialise" do
         response = Wrest::Native::Response.new(double('Response', :code => '200'))
-        
+
         response.should_receive(:deserialise)
         response.deserialize
       end
 
       it "has #deserialize_using delegate to #deserialise_using" do
         response = Wrest::Native::Response.new(double('Response', :code => '200'))
-        
+
         response.should_receive(:deserialise_using)
         response.deserialize_using
       end
@@ -56,24 +56,24 @@ module Wrest
     it "should build a Redirection instead of a normal response if the code is 301..303 or 305..3xx" do
       http_response = double(Net::HTTPRedirection)
       http_response.stub(:code).and_return('301')
-      
+
       Native::Response.new(http_response).class.should == Wrest::Native::Redirection
     end
 
     it "should build a normal response if the code is 304" do
       http_response = double(Net::HTTPRedirection)
       http_response.stub(:code).and_return('304')
-      
+
       Native::Response.new(http_response).class.should == Wrest::Native::Response
     end
-    
+
     it "should build a normal Response for non 3xx codes" do
       http_response = double(Net::HTTPResponse)
       http_response.stub(:code).and_return('200')
-      
+
       Native::Response.new(http_response).class.should == Wrest::Native::Response
     end
-    
+
     it "should know how to delegate to a translator" do
       http_response = double('response')
       http_response.stub(:code).and_return('200')
@@ -102,7 +102,7 @@ module Wrest
       http_response.should_receive(:content_type).and_return('application/json')
 
       response = Native::Response.new(http_response)
-      
+
       response.deserialise.should == { "commands"=>[{"title"=>"New",
             "action"=>"CreateDoc"},
           {"title"=>"Open","action"=>"OpenDoc"},{"title"=>"Close",
@@ -159,7 +159,7 @@ module Wrest
             http_response = Native::Response.new(build_ok_response('', cacheable_headers.merge("Cache-Control" => "abc,test=100,max-age=20")))
             http_response.cache_control_headers.should == ["abc", "test=100", "max-age=20"]
           end
-          
+
           it "should parse the cache-control header when it has leading and trailing spaces" do
             http_response = Native::Response.new(build_ok_response('', cacheable_headers.merge("Cache-Control" => "  abc, test=100 , max-age=20 ")))
             http_response.cache_control_headers.should == ["abc", "test=100", "max-age=20"]
@@ -365,7 +365,7 @@ module Wrest
           response = Native::Response.new(build_ok_response('', @headers))
           response.expires_not_in_our_past?.should == true
         end
-        
+
         it "should say not expired for requests with Expires in the future" do
           response = Native::Response.new(build_ok_response('', @headers))
           response.expired?.should == false

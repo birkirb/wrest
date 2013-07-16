@@ -17,15 +17,15 @@ group :libcurl_support do
 end
 
 group :nokogiri do
-  gem 'nokogiri', '~> 1'
+  gem 'nokogiri'
 end
 
 group :libxml do
   platforms :ruby do
-    gem 'libxml-ruby', '~> 2' unless Object.const_defined?('RUBY_ENGINE') && RUBY_ENGINE =~ /rbx/
+    gem 'libxml-ruby' unless Object.const_defined?('RUBY_ENGINE') && RUBY_ENGINE =~ /rbx/
   end
 end
- 
+
 group :jrexml do
   platforms :jruby do
     gem 'jrexml', '~> 0.5.3'

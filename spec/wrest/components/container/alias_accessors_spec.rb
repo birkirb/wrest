@@ -10,7 +10,7 @@ module Wrest::Components
     end
 
     it "should provide a macro to enable aliasing accessors" do
-      lambda{ @Demon.class_eval{ alias_accessors :shiriki => :chambala } }.should_not raise_error(NoMethodError)
+      lambda{ @Demon.class_eval{ alias_accessors :shiriki => :chambala } }.should_not raise_error()
     end
 
     describe 'aliasing' do
