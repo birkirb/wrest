@@ -17,7 +17,7 @@ module Wrest::Native
 
       cache_store = (options[:cache_store] || Wrest::Caching.default_store) unless options[:disable_cache]
       @cache_proxy = Wrest::CacheProxy::new(self, cache_store)
-      
+
       super(
             wrest_uri,
             Net::HTTP::Get,
@@ -45,6 +45,7 @@ module Wrest::Native
     # Returns a hash value for this Wrest::Native::Get object.
     # Objects that returns true when compared using the == operator would return the same hash value also.
     def hash
+      # TODO check the Vary header and use it's value to inform the value returned from this method, it is used as the cache key
       self.uri.hash + self.parameters.hash + self.username.hash + self.password.hash + self.verify_mode.hash + 20110106
     end
 

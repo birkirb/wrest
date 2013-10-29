@@ -1,11 +1,11 @@
 # Copyright 2009 Sidu Ponnappa
 
-# Licensed under the Apache License, Version 2.0 (the "License"); 
-# you may not use this file except in compliance with the License. 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at Http://www.apache.org/licenses/LICENSE-2.0
-# Unless required by applicable law or agreed to in writing, software distributed under the License 
-# is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-# See the License for the specific language governing permissions and limitations under the License. 
+# Unless required by applicable law or agreed to in writing, software distributed under the License
+# is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and limitations under the License.
 require "rexml/document"
 module Wrest #:nodoc:
   module Native #:nodoc:
@@ -26,7 +26,7 @@ module Wrest #:nodoc:
       attr_reader :http_response
       attr_accessor :deserialised_body
       include HttpCodes
-      
+
       extend Forwardable
       def_delegators  :@http_response,  :code, :message, :body, :http_version,
               :content_length, :content_type
@@ -97,7 +97,7 @@ module Wrest #:nodoc:
           new_headers[old_key] = old_value.is_a?(Array) ? old_value.join(",") : old_value
           new_headers
           }
-        
+
         @headers=Wrest::HashWithCaseInsensitiveAccess.new(nethttp_headers_with_string_values)
 
       end
@@ -115,11 +115,11 @@ module Wrest #:nodoc:
         self[Native::StandardHeaders::Connection].downcase == Native::StandardTokens::Close.downcase
       end
 
-      # Returns whether this response is cacheable. 
+      # Returns whether this response is cacheable.
       def cacheable?
         code_cacheable? && no_cache_flag_not_set? && no_store_flag_not_set? &&
             (not max_age.nil? or (expires_not_in_our_past? && expires_not_in_its_past?)) && pragma_nocache_not_set? &&
-            vary_tag_not_set?
+            vary_tag_determinable?
       end
 
       #:nodoc:
@@ -153,8 +153,8 @@ module Wrest #:nodoc:
       end
 
       #:nodoc:
-      def vary_tag_not_set?
-        headers['vary'].nil?
+      def vary_tag_determinable?
+        headers['vary'] != "*"
       end
 
       # Returns the Date from the response headers.
@@ -170,7 +170,7 @@ module Wrest #:nodoc:
         @expires = parse_datefield(headers, "expires")
       end
 
-      # Returns whether the Expires header of this response is earlier than current time.    
+      # Returns whether the Expires header of this response is earlier than current time.
       def expires_not_in_our_past?
         if expires.nil?
           false

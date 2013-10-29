@@ -231,8 +231,8 @@ module Wrest
           response.cacheable?.should == false
         end
 
-        it "should not be cacheable for response with a vary tag" do
-          response = Native::Response.new(build_ok_response('', cacheable_headers.merge('vary' => ['something'])))
+        it "should not be cacheable for response with an undeterminable vary tag" do
+          response = Native::Response.new(build_ok_response('', cacheable_headers.merge('vary' => ['*'])))
           response.cacheable?.should == false
         end
       end
@@ -285,10 +285,10 @@ module Wrest
 
         it "should return correct values for vary" do
           http_response = build_ok_response
-          Native::Response.new(http_response).vary_tag_not_set?.should == true
+          Native::Response.new(http_response).vary_tag_determinable?.should == true
 
-          http_response = build_ok_response('', cacheable_headers.merge("vary" => "something"))
-          Native::Response.new(http_response).vary_tag_not_set?.should == false
+          http_response = build_ok_response('', cacheable_headers.merge("vary" => "*"))
+          Native::Response.new(http_response).vary_tag_determinable?.should == false
         end
 
         it "should return correct values for response_date" do
