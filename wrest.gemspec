@@ -33,7 +33,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "sinatra", ["~> 1.0.0"]
   s.add_development_dependency "metric_fu" unless Object.const_defined?('RUBY_ENGINE') && RUBY_ENGINE =~ /rbx/
 
-  s.add_runtime_dependency "activesupport", ["~> 3"]
+  s.add_runtime_dependency "activesupport", ["~> 4"]
   s.add_runtime_dependency "builder", ["> 2.0"]
   s.add_runtime_dependency("multi_json", ["~> 1.0"])
   
