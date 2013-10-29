@@ -12,15 +12,15 @@ module Factories
   end
 
   def build_response(code,message = '', body = '', headers = {})
-    mock(Net::HTTPOK).tap do |response|
-      response.stub!(:code).and_return(code)
-      response.stub!(:message).and_return(message)
-      response.stub!(:body).and_return(body)
-      response.stub!(:http_version).and_return("1.1")
-      response.stub!(:to_hash).and_return(headers)
-      response.stub!('[]').and_return(nil)
+    double(Net::HTTPOK).tap do |response|
+      response.stub(:code).and_return(code)
+      response.stub(:message).and_return(message)
+      response.stub(:body).and_return(body)
+      response.stub(:http_version).and_return("1.1")
+      response.stub(:to_hash).and_return(headers)
+      response.stub('[]').and_return(nil)
       headers.each{|k,v|
-        response.stub!('[]').with(k).and_return(v)
+        response.stub('[]').with(k).and_return(v)
       }
     end
   end

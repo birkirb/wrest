@@ -5,14 +5,14 @@ unless RUBY_PLATFORM =~ /java/
     describe Curl::Response do
       context 'Aliased methods' do
         it "has #deserialize delegate to #deserialise" do
-          response = Wrest::Curl::Response.new(mock('Response', :headers => {'Content-type' => 'text/xml;charset=utf-8'}))
+          response = Wrest::Curl::Response.new(double('Response', :headers => {'Content-type' => 'text/xml;charset=utf-8'}))
           
           response.should_receive(:deserialise)
           response.deserialize
         end
 
         it "has #deserialize_using delegate to #deserialise_using" do
-          response = Wrest::Curl::Response.new(mock('Response', :headers => {'Content-type' => 'text/xml;charset=utf-8'}))
+          response = Wrest::Curl::Response.new(double('Response', :headers => {'Content-type' => 'text/xml;charset=utf-8'}))
           
           response.should_receive(:deserialise_using)
           response.deserialize_using
@@ -21,16 +21,16 @@ unless RUBY_PLATFORM =~ /java/
       
       describe 'Headers' do
         it "should know how to retrieve content type irrespective of the casing" do
-          http_response = mock('Patron::Response')
-          http_response.stub!(:headers).and_return({'Content-type' => 'text/xml;charset=utf-8'})
+          http_response = double('Patron::Response')
+          http_response.stub(:headers).and_return({'Content-type' => 'text/xml;charset=utf-8'})
           response = Wrest::Curl::Response.new(http_response)
           response.content_type.should == 'text/xml'
         end
       end
 
       it "should know how to deserialise json responses" do
-        http_response = mock('response')
-        http_response.stub!(:code).and_return('200')
+        http_response = double('response')
+        http_response.stub(:code).and_return('200')
         http_response.should_receive(:body).and_return(<<-EOJS
         { 
           "menu": "File",
@@ -55,8 +55,8 @@ EOJS
       
       describe "cache deserialised body" do
       it "should return the catched deserialised body when deserialise is called more than once" do
-        http_response = mock('curl response')
-        http_response.stub!(:headers).and_return({'Content-type' => 'text/xml;charset=utf-8'})
+        http_response = double('curl response')
+        http_response.stub(:headers).and_return({'Content-type' => 'text/xml;charset=utf-8'})
 
         response = Wrest::Curl::Response.new(http_response)
 

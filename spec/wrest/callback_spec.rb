@@ -2,7 +2,7 @@ require "spec_helper"
 
 module Wrest
   describe Callback do
-    let(:response_200){mock(Net::HTTPOK, :code => 200, :message => "OK", :body => '', :to_hash => {})}
+    let(:response_200){double(Net::HTTPOK, :code => 200, :message => "OK", :body => '', :to_hash => {})}
     context "new" do
       context "ensure_values_are_collections" do
         it "should return a hash whose values are collections given a hash with values that are not collections" do
@@ -130,7 +130,7 @@ module Wrest
         block_executed = false
         code = 200..206
         callback = Callback.new(code => lambda{|response| block_executed = true})
-        response_301 = mock(Net::HTTPOK, :code => 301, :message => "moved permanenlty", :body => '', :to_hash => {})
+        response_301 = double(Net::HTTPOK, :code => 301, :message => "moved permanenlty", :body => '', :to_hash => {})
         callback.execute(response_301)
         block_executed.should be_false
       end

@@ -12,20 +12,20 @@ module Wrest
         it "should know if the response code is HTTP #{status_message} for #{klass} object" do
           code = status
           method = (status_message.split.join('_').downcase + "?").to_sym
-          net_response = mock(mock_class)
-          net_response.stub!(:code).and_return(code)
-          net_response.stub!(:headers).and_return({})
-          net_response.stub!(:status).and_return(code)
+          net_response = double(mock_class)
+          net_response.stub(:code).and_return(code)
+          net_response.stub(:headers).and_return({})
+          net_response.stub(:status).and_return(code)
           klass.constantize.send(:new, net_response).send(method).should be_true 
         end
 
         it "should know if the response code is not HTTP #{status_message} for #{klass} object" do
           code = (status.to_i + 1).to_s
           method = (status_message.split.join('_').downcase + "?").to_sym
-          net_response = mock(mock_class)
-          net_response.stub!(:code).and_return(code)
-          net_response.stub!(:headers).and_return({})
-          net_response.stub!(:status).and_return(code)
+          net_response = double(mock_class)
+          net_response.stub(:code).and_return(code)
+          net_response.stub(:headers).and_return({})
+          net_response.stub(:status).and_return(code)
           klass.constantize.send(:new, net_response).send(method).should be_false
         end
       end

@@ -18,7 +18,7 @@ module Wrest
       uri = "http://localhost:3000".to_uri
       uri.should_not be_https
 
-      http = mock(Net::HTTP)
+      http = double(Net::HTTP)
       Net::HTTP.should_receive(:new).with('localhost', 3000).and_return(http)
       http.should_receive(:read_timeout=).with(60)
       http.should_receive(:set_debug_output).any_number_of_times
@@ -47,7 +47,7 @@ module Wrest
       uri = "http://localhost:3000".to_uri
       uri.should_not be_https
 
-      http = mock(Net::HTTP)
+      http = double(Net::HTTP)
       Net::HTTP.should_receive(:new).with('localhost', 3000).and_return(http)
       http.should_receive(:read_timeout=).with(60)
 

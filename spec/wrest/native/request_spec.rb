@@ -40,24 +40,24 @@ describe Wrest::Native::Request do
     uri = 'http://localhost/foo'.to_uri
     request = Wrest::Native::Get.new(uri)
     redirect_location = 'http://coathangers.com'
-    redirected_request = mock('Request to http://coathangers.com')
+    redirected_request = double('Request to http://coathangers.com')
 
-    mock_connection = mock('Http Connection')
-    uri.stub!(:create_connection).and_return(mock_connection)
+    mock_connection = double('Http Connection')
+    uri.stub(:create_connection).and_return(mock_connection)
     
-    raw_response = mock(Net::HTTPRedirection)
-    raw_response.stub!(:code).and_return('301')
-    raw_response.stub!(:message).and_return('')
-    raw_response.stub!(:body).and_return('')
+    raw_response = double(Net::HTTPRedirection)
+    raw_response.stub(:code).and_return('301')
+    raw_response.stub(:message).and_return('')
+    raw_response.stub(:body).and_return('')
 
     response = Wrest::Native::Redirection.new(raw_response)
-    response.stub!(:[]).with('location').and_return(redirect_location)
+    response.stub(:[]).with('location').and_return(redirect_location)
 
     mock_connection.should_receive(:request).and_return(raw_response)
     mock_connection.should_receive(:set_debug_output)
     
     Wrest::Native::Response.should_receive(:new).and_return(response)
-    redirected_request.stub!(:get)
+    redirected_request.stub(:get)
     Wrest::Uri.should_receive(:new).with(redirect_location, hash_including(:follow_redirects_count=>1)).and_return(redirected_request)
     
     request.invoke
@@ -67,20 +67,20 @@ describe Wrest::Native::Request do
   it "should not set basic authentication for request if either of username or password is nil" do
     uri = 'http://localhost/foo'.to_uri
     request = Wrest::Native::Get.new(uri)
-    http_request = mock(Net::HTTP::Get, :method => "GET", :hash => {})
+    http_request = double(Net::HTTP::Get, :method => "GET", :hash => {})
     http_request.should_not_receive(:basic_auth)
     request.should_receive(:http_request).any_number_of_times.and_return(http_request)
-    request.should_receive(:do_request).and_return(mock(Net::HTTPOK, :code => "200", :message => 'OK', :body => '', :to_hash => {}))
+    request.should_receive(:do_request).and_return(double(Net::HTTPOK, :code => "200", :message => 'OK', :body => '', :to_hash => {}))
     request.invoke
   end
 
   it "should set basic authentication for request" do
     uri = 'http://localhost/foo'.to_uri
     request = Wrest::Native::Get.new(uri, {}, {}, {:username => "name", :password => "password"})
-    http_request = mock(Net::HTTP::Get, :method => "GET", :hash => {})
+    http_request = double(Net::HTTP::Get, :method => "GET", :hash => {})
     http_request.should_receive(:basic_auth).with('name', 'password')
     request.should_receive(:http_request).any_number_of_times.and_return(http_request)
-    request.should_receive(:do_request).and_return(mock(Net::HTTPOK, :code => "200", :message => 'OK', :body => '', :to_hash => {}))
+    request.should_receive(:do_request).and_return(double(Net::HTTPOK, :code => "200", :message => 'OK', :body => '', :to_hash => {}))
     request.invoke
   end
 
@@ -92,11 +92,11 @@ describe Wrest::Native::Request do
   
   context "SSL options" do
     let(:uri){ 'https://localhost/foo'.to_uri }
-    let(:http_request){ mock(Net::HTTP::Get, :method => "GET") }
+    let(:http_request){ double(Net::HTTP::Get, :method => "GET") }
     def setup_request_expectations(request)
       request.tap do |r|
         request.should_receive(:http_request).any_number_of_times.and_return(http_request)
-        request.should_receive(:do_request).and_return(mock(Net::HTTPOK, :code => "200", :message => 'OK', :body => '', :to_hash => {}))
+        request.should_receive(:do_request).and_return(double(Net::HTTPOK, :code => "200", :message => 'OK', :body => '', :to_hash => {}))
       end
     end
     
@@ -125,7 +125,7 @@ describe Wrest::Native::Request do
   it "should not store response in cache if the original request was not GET" do
     cache = {}
     post = Wrest::Native::Post.new("http://localhost".to_uri, {}, {}, cacheable_headers, {:cache_store => cache})
-    post.should_receive(:do_request).and_return(mock(Net::HTTPOK, :code => "200", :message => 'OK', :body => '', :to_hash => {}))
+    post.should_receive(:do_request).and_return(double(Net::HTTPOK, :code => "200", :message => 'OK', :body => '', :to_hash => {}))
 
     cache.should_not_receive(:[])
     post.invoke
@@ -147,9 +147,9 @@ describe Wrest::Native::Request do
       uri = 'http://localhost/foo'.to_uri
       request = Wrest::Native::Get.new(uri,{},{},:callback => response_handler)
 
-      response_204 = mock(Net::HTTPOK, :code => "204", :message => 'not OK', :body => '', :to_hash => {})
-      response_200 = mock(Net::HTTPOK, :code => "200", :message => 'OK', :body => '', :to_hash => {})
-      response_501 = mock(Net::HTTPOK, :code => "501", :message => 'not implemented', :body => '', :to_hash => {})
+      response_204 = double(Net::HTTPOK, :code => "204", :message => 'not OK', :body => '', :to_hash => {})
+      response_200 = double(Net::HTTPOK, :code => "200", :message => 'OK', :body => '', :to_hash => {})
+      response_501 = double(Net::HTTPOK, :code => "501", :message => 'not implemented', :body => '', :to_hash => {})
 
       request.should_receive(:do_request).and_return(response_200, response_501, response_204)
 
@@ -165,7 +165,7 @@ describe Wrest::Native::Request do
     end
 
     it "should correctly use the detailed_http_logging option" do
-      logger = mock(Logger)
+      logger = double(Logger)
       logger.should_receive(:<<).at_least(:once).with {|detailed_log| detailed_log.include? "opening connection to"}
       logger.should_receive(:<<).any_number_of_times
 

@@ -181,7 +181,7 @@ module Wrest
 
     describe 'HTTP actions' do
       def setup_http
-        http = mock(Net::HTTP)
+        http = double(Net::HTTP)
         Net::HTTP.should_receive(:new).with('localhost', 3000).and_return(http)
         http.should_receive(:read_timeout=).with(60)
         http.should_receive(:set_debug_output).with(nil)
@@ -235,10 +235,10 @@ module Wrest
      request = Wrest::Native::Get.new(uri, {}, {} ,{:username => "ooga", :password =>"bar"})
            Http::Get.should_receive(:new).with(uri,{},{},{:username => "ooga", :password =>"bar"}).and_return(request)
 
-    http_request = mock(Net::HTTP::Get, :method => "GET", :hash => {})
+    http_request = double(Net::HTTP::Get, :method => "GET", :hash => {})
     http_request.should_receive(:basic_auth).with('ooga', 'bar')
     request.should_receive(:http_request).any_number_of_times.and_return(http_request)
-    request.should_receive(:do_request).and_return(mock(Net::HTTPOK, :code => "200", :message => 'OK', :body => '', :to_hash => {}))
+    request.should_receive(:do_request).and_return(double(Net::HTTPOK, :code => "200", :message => 'OK', :body => '', :to_hash => {}))
              uri.get
           end
 
@@ -430,7 +430,7 @@ module Wrest
       it "should not mutate state of the uri across requests" do
         uri = "http://localhost:3000/glassware".to_uri
 
-        http = mock(Net::HTTP)
+        http = double(Net::HTTP)
         Net::HTTP.should_receive(:new).with('localhost', 3000).any_number_of_times.and_return(http)
         http.should_receive(:read_timeout=).any_number_of_times.with(60)
         http.should_receive(:set_debug_output).any_number_of_times
@@ -449,10 +449,10 @@ module Wrest
       end
 
       def setup_connection
-        connection = mock("Net::HTTP")
-        response_200 = mock(Net::HTTPOK, :code => "200", :message => 'OK', :body => '', :to_hash => {})
-        connection.stub!(:set_debug_output)
-        connection.stub!(:request).and_return(response_200)
+        connection = double("Net::HTTP")
+        response_200 = double(Net::HTTPOK, :code => "200", :message => 'OK', :body => '', :to_hash => {})
+        connection.stub(:set_debug_output)
+        connection.stub(:request).and_return(response_200)
         connection
       end
 
@@ -463,7 +463,7 @@ module Wrest
           it "should call the given block with a Callback object" do
             connection = setup_connection
             uri = "http://localhost:3000/".to_uri
-            uri.stub!(:create_connection).and_return(connection)
+            uri.stub(:create_connection).and_return(connection)
             callback_called = false
             uri.send(http_method.to_sym) do |callback|
               callback.should be_an_instance_of(Callback)
@@ -476,7 +476,7 @@ module Wrest
             connection = setup_connection
             on_ok = false
             uri = "http://localhost:3000/".to_uri
-            uri.stub!(:create_connection).and_return(connection)
+            uri.stub(:create_connection).and_return(connection)
             uri.send(http_method.to_sym) do |callback|
               callback.on_ok{|response| on_ok = true}
             end
@@ -526,7 +526,7 @@ module Wrest
             it "should yield callback object if a block is given for Uri::get" do
               connection = setup_connection
               uri = "http://localhost:3000/".to_uri
-              uri.stub!(:create_connection).and_return(connection)
+              uri.stub(:create_connection).and_return(connection)
               callback_called = false
               uri.send(http_method.to_sym) do |callback|
                 callback.is_a?(Callback).should be_true
@@ -539,7 +539,7 @@ module Wrest
               connection = setup_connection
               on_ok = false
               uri = "http://localhost:3000/".to_uri
-              uri.stub!(:create_connection).and_return(connection)
+              uri.stub(:create_connection).and_return(connection)
               uri.send(http_method.to_sym) do |callback|
                 callback.on_ok{|response| on_ok = true}
               end
@@ -588,7 +588,7 @@ module Wrest
         it "should call the given block with a Callback object" do
           connection = setup_connection
           uri = "http://localhost:3000/".to_uri
-          uri.stub!(:create_connection).and_return(connection)
+          uri.stub(:create_connection).and_return(connection)
           callback_called = false
           uri.post_form do |callback|
             callback.is_a?(Callback).should be_true
@@ -601,7 +601,7 @@ module Wrest
           connection = setup_connection
           on_ok = false
           uri = "http://localhost:3000/".to_uri
-          uri.stub!(:create_connection).and_return(connection)
+          uri.stub(:create_connection).and_return(connection)
           request = Wrest::Native::Post.new(uri)
           uri.post_form do |callback|
             callback.on_ok{|response| on_ok = true}

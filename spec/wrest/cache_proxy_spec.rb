@@ -7,7 +7,7 @@ describe Wrest::CacheProxy do
     @request_uri = 'http://localhost/foo'.to_uri
     @get         = Wrest::Native::Get.new(@request_uri, {}, {}, {:cache_store => @cache})
     @ok_response = Wrest::Native::Response.new(build_ok_response('', cacheable_headers()))
-    @get.stub!(:invoke_without_cache_check).and_return(@ok_response)
+    @get.stub(:invoke_without_cache_check).and_return(@ok_response)
     @cache_proxy = @get.cache_proxy
   end
 

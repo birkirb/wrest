@@ -2,7 +2,7 @@ require "spec_helper"
 
 module Wrest::Components::Translators
   describe Xml do
-    let(:http_response) { mock('Http Reponse') }
+    let(:http_response) { double('Http Reponse') }
     it "should know how to convert xml to a hashmap" do
       http_response.should_receive(:body).and_return("<ooga><age>12</age></ooga>")
 

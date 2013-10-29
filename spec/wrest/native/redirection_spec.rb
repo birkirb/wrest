@@ -3,7 +3,7 @@ require "spec_helper"
 describe Wrest::Native::Redirection do
   
   it "should make a request to the url in its location header and return the response" do
-    mock_net_http_response = mock(Net::HTTPRedirection)
+    mock_net_http_response = double(Net::HTTPRedirection)
     redirect_url = 'http://redirect.com'
     redirect_uri = redirect_url.to_uri
     mock_net_http_response.should_receive(:to_hash).and_return('location' => redirect_url)
@@ -12,7 +12,7 @@ describe Wrest::Native::Redirection do
     Wrest::Uri.should_receive(:new).with(redirect_url, anything).and_return(redirect_uri)
     
     after_redirect_request = Wrest::Native::Get.new(redirect_uri)
-    final_mock_response = mock(Wrest::Native::Response)
+    final_mock_response = double(Wrest::Native::Response)
     after_redirect_request.should_receive(:invoke).and_return(final_mock_response)
     
     Wrest::Native::Get.should_receive(:new).with(redirect_uri, {}, {}, {:username=>nil, :password=>nil}).and_return(after_redirect_request)
@@ -28,15 +28,15 @@ describe Wrest::Native::Redirection do
 
     request_url = 'http://redirect.com'
 
-    response = mock(Net::HTTPRedirection)
-    response.stub!(:code).and_return('301')
-    response.stub!(:message).and_return('')
-    response.stub!(:body).and_return('')
-    response.stub!(:to_hash).and_return('location' => request_url)
+    response = double(Net::HTTPRedirection)
+    response.stub(:code).and_return('301')
+    response.stub(:message).and_return('')
+    response.stub(:body).and_return('')
+    response.stub(:to_hash).and_return('location' => request_url)
 
-    http_connection = mock(Net::HTTP)
-    http_connection.stub!(:read_timeout=)
-    http_connection.stub!(:set_debug_output)
+    http_connection = double(Net::HTTP)
+    http_connection.stub(:read_timeout=)
+    http_connection.stub(:set_debug_output)
     http_connection.should_receive(:request).exactly(5).times.and_return(response)
 
     Net::HTTP.should_receive(:new).exactly(5).times.and_return(http_connection)

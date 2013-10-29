@@ -2,7 +2,7 @@ require "spec_helper"
 
 module Wrest::Components::Translators
   describe Json do
-    let(:http_response) { mock('Http Reponse') }
+    let(:http_response) { double('Http Reponse') }
     
     it "should know how to convert json to a hashmap" do
       http_response.should_receive(:body).and_return("{ 

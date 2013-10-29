@@ -17,7 +17,7 @@ module Wrest::Components
     end
 
     it "should ensure that the next mutator is invoked for a subclass" do
-      next_mutator = mock('Mutator')
+      next_mutator = double('Mutator')
       mutator = Mutators::CamelToSnakeCase.new(next_mutator)
 
       next_mutator.should_receive(:mutate).with(['a', 1]).and_return([:a, '1'])

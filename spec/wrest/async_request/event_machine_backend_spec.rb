@@ -10,7 +10,7 @@ module Wrest::AsyncRequest
         hash = {}
         uri = "http://localhost:3000".to_uri
         request = Wrest::Native::Get.new(uri,{},{},:callback => Wrest::Callback.new({200 => lambda{|response| hash["success"] = true}}))
-        response_200 = mock(Net::HTTPOK, :code => "200", :message => 'OK', :body => '', :to_hash => {})
+        response_200 = double(Net::HTTPOK, :code => "200", :message => 'OK', :body => '', :to_hash => {})
         request.should_receive(:do_request).and_return(response_200)
 
         async_obj = EventMachineBackend.new
