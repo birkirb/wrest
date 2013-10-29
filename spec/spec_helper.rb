@@ -15,5 +15,5 @@ Wrest.logger = Logger.new(File.open("#{Wrest::Root}/../log/test.log", 'a'))
 
 RSpec.configure do |config|
   config.include(Factories)
-  config.filter_run :functional => ENV["wrest_functional_spec"] == "true" || nil
+  # config.filter_run :functional => ENV["wrest_functional_spec"] == "true" || nil
 end
