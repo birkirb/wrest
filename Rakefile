@@ -16,18 +16,18 @@ Bundler::GemHelper.install_tasks
 Bundler.setup
 
 require 'rspec/core/rake_task'
-require 'hanna/rdoctask'
+# require 'hanna/rdoctask'
 require 'rake/contrib/sshpublisher'
 
-begin
-  require 'metric_fu'
-  MetricFu::Configuration.run do |config|
-    config.rcov[:test_files] = ['spec/**/*_spec.rb']
-    config.rcov[:rcov_opts] << "-Ispec" # Needed to find spec_helper
-  end
-rescue LoadError
-  puts 'metric_fu is not available. Install it with: gem install jscruggs-metric_fu -s http://gems.github.com'
-end
+# begin
+#   require 'metric_fu'
+#   MetricFu::Configuration.run do |config|
+#     config.rcov[:test_files] = ['spec/**/*_spec.rb']
+#     config.rcov[:rcov_opts] << "-Ispec" # Needed to find spec_helper
+#   end
+# rescue LoadError
+#   puts 'metric_fu is not available. Install it with: gem install jscruggs-metric_fu -s http://gems.github.com'
+# end
 
 desc 'Default: run spec tests.'
 task :default => 'rspec:unit'
@@ -53,17 +53,15 @@ namespace :rspec do
   end
 end
 
+# desc 'Generate documentation for Wrest'
+# Rake::RDocTask.new(:rdoc) do |rdoc|
+#   rdoc.rdoc_dir = 'rdoc'
+#   rdoc.title = 'Wrest Documentation'
+#   rdoc.options << '--line-numbers' << '--inline-source'
+#   rdoc.rdoc_files.include('README.rdoc')
+#   rdoc.rdoc_files.include('lib/**/*.rb')
+# end
 
-desc 'Generate documentation for Wrest'
-Rake::RDocTask.new(:rdoc) do |rdoc|
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = 'Wrest Documentation'
-  rdoc.options << '--line-numbers' << '--inline-source'
-  rdoc.rdoc_files.include('README.rdoc')
-  rdoc.rdoc_files.include('lib/**/*.rb')
-end
-
-  
 namespace :rubyforge do
 
   desc "Release gem and RDoc documentation to RubyForge"

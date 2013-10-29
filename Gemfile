@@ -1,8 +1,9 @@
 source "http://rubygems.org"
 
-gem 'hanna'
+# gem 'hanna'
 gem 'rubyforge'
-gem 'simplecov', :platforms => :mri_19
+gem 'simplecov', :platforms => :mri_20
+gem 'rake', '~> 10'
 
 group :multipart_support do
   gem 'multipart-post', '~> 1'
@@ -21,7 +22,7 @@ end
 
 group :libxml do
   platforms :ruby do
-    gem 'libxml-ruby', '~> 1' unless Object.const_defined?('RUBY_ENGINE') && RUBY_ENGINE =~ /rbx/
+    gem 'libxml-ruby', '~> 2' unless Object.const_defined?('RUBY_ENGINE') && RUBY_ENGINE =~ /rbx/
   end
 end
  
