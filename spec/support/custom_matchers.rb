@@ -1,5 +1,3 @@
-require 'rspec/matchers/have'
-
 RSpec::Matchers.define :have do |expected|
   chain :callbacks_for do |key|
     @key = key
@@ -14,7 +12,7 @@ RSpec::Matchers.define :have do |expected|
     end
 
     if pass
-      unless (actual[@key].size == expected) 
+      unless (actual[@key].size == expected)
         @failure_message += "expected #{expected} callbacks but got #{actual[@key].size}. "
         pass = false
       end
@@ -39,5 +37,3 @@ RSpec::Matchers.define :have do |expected|
     @failure_message
   end
 end
-
-
