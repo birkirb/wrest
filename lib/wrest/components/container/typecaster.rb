@@ -33,7 +33,8 @@ module Wrest
         end
 
         def as_boolean
-          ActiveSupport::XmlMini::PARSING['boolean']
+          # ActiveSupport::XmlMini::PARSING['boolean']
+          Proc.new { |boolean| %w(1 true).include?(boolean.to_s.strip) }
         end
 
         def as_decimal
