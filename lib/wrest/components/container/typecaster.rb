@@ -119,7 +119,7 @@ module Wrest
           initialize_without_typecasting(attributes)
           self.class.typecast_map.each do |key, typecaster|
             value = @attributes[key]
-            @attributes[key] = typecaster.call(value) if (value.is_a?(String) || value.is_a?(Hash) || value.is_a?(Array))
+            @attributes[key] = typecaster.call(value) if (value.is_a?(String) || value.is_a?(Hash) || value.is_a?(Array) || value.is_a?(Fixnum))
           end
         end
       end
