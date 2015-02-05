@@ -25,6 +25,8 @@ module Wrest::Caching
       if @size < @limit
         @size += 1
         @bounded_hash[key] = value
+      else
+        Wrest.logger.warn("<- (Wrest::Caching::BoundedHash) cache is full")
       end
     end
 

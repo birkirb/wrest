@@ -18,23 +18,31 @@ describe Wrest::Caching do
     end
 
     context 'when initialized with a limit' do
-      let(:instance) do
-        Wrest::Caching::BoundedHash.new(10)
+      before do
+        @logger_mock = double("Wrest.logger").as_null_object
+        Wrest.stub_chain(:logger).and_return(@logger_mock)
+        @instance = Wrest::Caching::BoundedHash.new(10)
+      end
+
+      after do
+        Wrest.unstub(:logger)
       end
 
       it 'should use the given cache limit' do
-        expect(instance.limit).to eql(10)
+        expect(@instance.limit).to eql(10)
       end
 
       it 'should at most cache requests until the limit is reached' do
-        (1..instance.limit+10).each do |request_number|
-          instance[request_number] = request_number
+        (1..@instance.limit+10).each do |request_number|
           if request_number <= 10
-            expect(instance[request_number]).to eql(request_number)
-            expect(instance.size).to eql(request_number)
+            @instance[request_number] = request_number
+            expect(@instance[request_number]).to eql(request_number)
+            expect(@instance.size).to eql(request_number)
           else
-            expect(instance[request_number]).to be_nil
-            expect(instance.size).to eql(10)
+            expect(@logger_mock).to receive(:warn).with(/<- \(Wrest::Caching::BoundedHash\) cache is full/)
+            @instance[request_number] = request_number
+            expect(@instance[request_number]).to be_nil
+            expect(@instance.size).to eql(10)
           end
         end
       end
