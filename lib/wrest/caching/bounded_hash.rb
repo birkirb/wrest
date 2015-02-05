@@ -17,7 +17,11 @@ module Wrest::Caching
 
     def [](key)
       if @bounded_hash.has_key?(key)
+        Wrest.logger.debug("<- (Wrest::Caching::BoundedHash) cache hit")
         @bounded_hash[key]
+      else
+        Wrest.logger.debug("<- (Wrest::Caching::BoundedHash) cache miss")
+        nil
       end
     end
 
