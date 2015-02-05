@@ -14,6 +14,11 @@ module Wrest
       require "wrest/caching/memcached"
     end
 
+    # Loads the BoundedHash caching back-end
+    def self.enable_bounded_hash
+      require "wrest/caching/bounded_hash"
+    end
+
     # Configures Wrest to cache all requests. This will use a Ruby Hash.
     # WARNING: This should NEVER be used in a real environment. The Hash will keep on growing since Wrest does not limit the size of a cache store.
     #
@@ -21,6 +26,11 @@ module Wrest
     # that keeps the number of entries stored within bounds.
     def self.default_to_hash!
       self.default_store = Hash.new
+    end
+
+    def self.default_to_bounded_hash!
+      self.enable_bounded_hash
+      self.default_store = Wrest::Caching::BoundedHash.new
     end
 
     # Default Wrest to using memcached for caching requests. 
