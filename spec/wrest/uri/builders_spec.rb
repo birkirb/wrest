@@ -44,7 +44,7 @@ describe Wrest::Uri::Builders do
     before(:all){ Wrest::Caching.enable_bounded_hash }
     it "should return a new uri" do
       cache_enabled_uri = uri.using_bounded_hash
-      expect(uri).to_not eql(cache_enabled_uri)
+      uri.should_not equal(cache_enabled_uri)
     end
 
     it "should set bounded hash as cache store in options hash" do
