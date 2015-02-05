@@ -38,7 +38,7 @@ module Wrest::Caching
     def delete(key)
       value = self[key]
 
-      @size -= 1
+      @size -= 1 if value
       @bounded_hash.delete key
 
       return value
