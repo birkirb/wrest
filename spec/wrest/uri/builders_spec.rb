@@ -40,6 +40,19 @@ describe Wrest::Uri::Builders do
     end
   end
 
+  context "using_bounded_hash" do
+    before(:all){ Wrest::Caching.enable_bounded_hash }
+    it "should return a new uri" do
+      cache_enabled_uri = uri.using_bounded_hash
+      uri.should_not equal(cache_enabled_uri)
+    end
+
+    it "should set bounded hash as cache store in options hash" do
+      cache_enabled_uri = uri.using_bounded_hash
+      expect(cache_enabled_uri.instance_variable_get("@options")[:cache_store]).to be_an_instance_of(Wrest::Caching::BoundedHash)
+    end
+  end
+
   context "using_memcached" do
     before(:all){ Wrest::Caching.enable_memcached }
     it "should return a new uri" do
