@@ -51,7 +51,6 @@ namespace :rspec do
   end
 end
 
-
 desc 'Generate documentation for Wrest'
 RDoc::Task.new do |rdoc|
   rdoc.rdoc_dir = 'rdoc'

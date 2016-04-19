@@ -10,7 +10,7 @@ group :multipart_support do
 end
 
 group :nokogiri do
-  gem 'nokogiri', '~> 1'
+  gem 'nokogiri'
 end
 
 group :libxml do

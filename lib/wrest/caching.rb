@@ -33,7 +33,7 @@ module Wrest
       self.default_store = Hash.new
     end
 
-    # Default Wrest to using memcached for caching requests. 
+    # Default Wrest to using memcached for caching requests.
     def self.default_to_memcached!
       self.enable_memcached
       self.default_store = Wrest::Caching::Memcached.new 
