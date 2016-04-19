@@ -19,6 +19,11 @@ module Wrest
       require "wrest/caching/redis"
     end
 
+    # Loads the BoundedHash caching back-end
+    def self.enable_bounded_hash
+      require "wrest/caching/bounded_hash"
+    end
+
     # Configures Wrest to cache all requests. This will use a Ruby Hash.
     # WARNING: This should NEVER be used in a real environment. The Hash will 
     # keep growing since Wrest does not limit the size of a cache store.
@@ -40,6 +45,12 @@ module Wrest
     def self.default_to_redis!(redis_options = {})
       self.enable_redis
       self.default_store = Wrest::Caching::Redis.new(redis_options)
+    end
+
+    # Default Wrest to using bounded for caching requests.
+    def self.default_to_bounded_hash!
+      self.enable_bounded_hash
+      self.default_store = Wrest::Caching::BoundedHash.new
     end
 
     # Assign the default cache store to be used. Default is none.
