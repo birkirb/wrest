@@ -183,7 +183,7 @@ module Wrest
       def setup_http
         http = double(Net::HTTP)
         Net::HTTP.should_receive(:new).with('localhost', 3000).and_return(http)
-        http.should_receive(:read_timeout=).with(60)
+        http.should_receive(:read_timeout=).with(10)
         http.should_receive(:set_debug_output).with(nil)
         http
       end
@@ -432,7 +432,7 @@ module Wrest
 
         http = double(Net::HTTP)
         Net::HTTP.should_receive(:new).with('localhost', 3000).at_least(1).times.and_return(http)
-        http.should_receive(:read_timeout=).at_least(1).times.with(60)
+        http.should_receive(:read_timeout=).at_least(1).times.with(10)
         http.should_receive(:set_debug_output).at_least(1).times
 
         request_get = Net::HTTP::Get.new('/glassware?owner=Kai&type=bottle', {'page' => '2', 'per_page' => '5'})
