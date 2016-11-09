@@ -89,14 +89,14 @@ module Wrest::Native
       http_request.basic_auth username, password unless username.nil? || password.nil?
 
       prefix = "#{http_request.method} #{self.hash} #{@connection.hash} #{Thread.current.object_id}"
-      
+
       Wrest.logger.debug "<- (#{prefix}) #{@uri.protocol}://#{@uri.host}:#{@uri.port}#{@http_request.path}"
       time = Benchmark.realtime { response = Wrest::Native::Response.new( do_request ) }
       Wrest.logger.debug "-> (#{prefix}) %d %s (%d bytes %.2fs)" % [response.code, response.message, response.body ? response.body.length : 0, time]
 
       execute_callback_if_any(response)
-      
-      @follow_redirects ? response.follow(@options) : response
+
+      @follow_redirects ? response.follow(@options.merge(request_uri: @uri)) : response
     rescue Timeout::Error => e
       raise Wrest::Exceptions::Timeout.new(e)
     end
