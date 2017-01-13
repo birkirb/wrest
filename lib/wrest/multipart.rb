@@ -8,9 +8,9 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 begin
-  gem 'multipart-post', '~> 1.0'
+  gem 'multipart-post', '~> 2.0'
 rescue Gem::LoadError => e
-  Wrest.logger.debug "Multipart Post ~> 1.0 not found. Multipart Post is necessary to be able to post multipart. To install Multipart Post run 'sudo gem install multipart-post'"
+  Wrest.logger.debug "Multipart Post ~> 2.0 not found. Multipart Post is necessary to be able to post multipart. To install Multipart Post run 'sudo gem install multipart-post'"
   raise e
 end
 
@@ -21,7 +21,7 @@ module Wrest
   # To enable Multipart support, use
   #  require 'wrest/multipart'
   #
-  # Multipart support is currently only available on Net::Http and not when using libcurl.
+  # Multipart support is currently only available on Net::Http
   # It depends on the multipart-post gem being available. To install multipart-post
   #   (sudo) gem install multipart-post
   #
