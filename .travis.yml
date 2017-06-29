@@ -1,4 +1,9 @@
 language: ruby
+
 rvm:
-  - 2.0.0
-  - jruby-1.7.6
+  - 2.2.2
+  - 2.4.0
+
+os:
+- linux
+- osx
