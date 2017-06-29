@@ -1,4 +1,4 @@
-# Copyright 2009 Sidu Ponnappa
+# Copyright 2009-2016 Sidu Ponnappa
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -7,23 +7,20 @@
 # is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-begin
-  gem 'eventmachine'
-rescue Gem::LoadError => e
-  Wrest.logger.debug "Eventmachine ~> 0.12.10 not found. Wrest uses Eventmachine to perform evented asynchronous requests"
-  raise e
-end
-
-require 'eventmachine'
-
 module Wrest
   module AsyncRequest
-    class EventMachineBackend
-      def execute(request)
-        EventMachine.run do
-          request.invoke
-          EventMachine.stop
-        end
+    class ThreadPool
+      def initialize(number_of_threads)
+        @pool = Concurrent::FixedThreadPool.new(number_of_threads)
+      end
+      
+      def execute_eventually(request)
+        @pool.post { request.invoke }
+        nil
+      end
+      
+      def join_pool_threads!
+        @pool.wait_for_termination
       end
     end
   end

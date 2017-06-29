@@ -27,7 +27,7 @@ describe Wrest::Uri::Builders do
       evented_uri.instance_variable_get("@options")[:asynchronous_backend].should be_a(Wrest::AsyncRequest::EventMachineBackend)
     end
   end
-  
+
   context "using_hash" do
     it "should return a new uri" do
       cache_enabled_uri = uri.using_hash
@@ -37,6 +37,19 @@ describe Wrest::Uri::Builders do
     it "should set a hash as cache store in options hash" do
       cache_enabled_uri = uri.using_hash
       cache_enabled_uri.instance_variable_get("@options")[:cache_store].should be_an_instance_of(Hash)
+    end
+  end
+
+  context "using_bounded_hash" do
+    before(:all){ Wrest::Caching.enable_bounded_hash }
+    it "should return a new uri" do
+      cache_enabled_uri = uri.using_bounded_hash
+      uri.should_not equal(cache_enabled_uri)
+    end
+
+    it "should set bounded hash as cache store in options hash" do
+      cache_enabled_uri = uri.using_bounded_hash
+      expect(cache_enabled_uri.instance_variable_get("@options")[:cache_store]).to be_an_instance_of(Wrest::Caching::BoundedHash)
     end
   end
 
@@ -53,6 +66,32 @@ describe Wrest::Uri::Builders do
     end
   end
 
+  context "using_redis" do
+    before(:all){ Wrest::Caching.enable_redis }
+    it "should return a new uri" do
+      cache_enabled_uri = uri.using_redis
+      expect(uri).to eq(cache_enabled_uri)
+    end
+
+    it "should set redis as cache store in options hash" do
+      cache_enabled_uri = uri.using_redis
+      expect(cache_enabled_uri.instance_variable_get("@options")[:cache_store]).to be_a_kind_of(Wrest::Caching::Redis)
+    end
+  end
+
+  context "using_bounded_hash" do
+    before(:all){ Wrest::Caching.enable_bounded_hash }
+    it "should return a new uri" do
+      cache_enabled_uri = uri.using_bounded_hash
+      uri.should_not equal(cache_enabled_uri)
+    end
+
+    it "should set bounded hash as cache store in options hash" do
+      cache_enabled_uri = uri.using_bounded_hash
+      expect(cache_enabled_uri.instance_variable_get("@options")[:cache_store]).to be_an_instance_of(Wrest::Caching::BoundedHash)
+    end
+  end
+
   context "disable_cache" do
     it "should return a new uri" do
       cache_disabled_uri = uri.disable_cache
@@ -61,10 +100,10 @@ describe Wrest::Uri::Builders do
 
     it "should set a flag indicating to disable cache on requests made through the uri" do
       cache_disabled_uri = uri.disable_cache
-      cache_disabled_uri.instance_variable_get("@options")[:disable_cache].should be_true
+      cache_disabled_uri.instance_variable_get("@options")[:disable_cache].should be_truthy
     end
   end
-  
+
   context "using_cookie" do
     it "builds a new Uri that has the cookie as a default" do
       cookied_uri = uri.using_cookie('some-encoded-cookie-string')

@@ -7,7 +7,7 @@ describe Wrest::CacheProxy do
     @request_uri = 'http://localhost/foo'.to_uri
     @get         = Wrest::Native::Get.new(@request_uri, {}, {}, {:cache_store => @cache})
     @ok_response = Wrest::Native::Response.new(build_ok_response('', cacheable_headers()))
-    @get.stub(:invoke_without_cache_check).and_return(@ok_response)
+    allow(@get).to receive(:invoke_without_cache_check).and_return(@ok_response)
     @cache_proxy = @get.cache_proxy
   end
 
@@ -34,24 +34,24 @@ describe Wrest::CacheProxy do
 
   context "default caching" do
     it "should check if response already exists in cache when making a request" do
-      @cache.should_receive(:[]).with(@get.hash)
+      @cache.should_receive(:[]).with(@get.uri.to_s)
       @cache_proxy.get
     end
 
     it "should give a new response if it is not in the cache" do
-      @cache.should_receive(:[]).with(@get.hash).and_return(nil)
+      @cache.should_receive(:[]).with(@get.uri.to_s).and_return(nil)
       @cache_proxy.get.should == @ok_response
     end
 
     it "should cache the response after invoke makes a fresh request" do
-      @cache.should_receive(:[]).with(@get.hash).and_return(nil)
+      @cache.should_receive(:[]).with(@get.uri.to_s).and_return(nil)
       @get.should_receive(:invoke_without_cache_check).and_return(@ok_response)
       @cache_proxy.should_receive(:cache).with(@ok_response)
       @cache_proxy.get
     end
 
     it "should not call invoke_without_cache_check if response exists in cache" do
-      @cache.should_receive(:[]).with(@get.hash).and_return(@ok_response)
+      @cache.should_receive(:[]).with(@get.uri.to_s).and_return(@ok_response)
       @get.should_not_receive(:invoke_without_cache_check)
       @cache_proxy.get
     end
@@ -65,14 +65,14 @@ describe Wrest::CacheProxy do
     it "should use the cached response if it finds a matching one that hasn't expired" do
       @cached_response=Wrest::Native::Response.new(build_ok_response('', cacheable_headers().tap { |h| h["random"] = 123 }))
 
-      @cache.should_receive(:[]).with(@get.hash).and_return(@cached_response)
+      @cache.should_receive(:[]).with(@get.uri.to_s).and_return(@cached_response)
       @cached_response.should_receive(:expired?).and_return(false)
 
       @cache_proxy.get.should == @cached_response
     end
 
     it "should check whether an expired cache entry can be validated" do
-      @cache.should_receive(:[]).with(@get.hash).and_return(@ok_response)
+      @cache.should_receive(:[]).with(@get.uri.to_s).and_return(@ok_response)
 
       @ok_response.should_receive(:expired?).and_return(true)
       @ok_response.should_receive(:can_be_validated?)
@@ -92,7 +92,7 @@ describe Wrest::CacheProxy do
           @ok_response.should_receive(:expired?).and_return(true)
           @ok_response.can_be_validated?.should == true
 
-          @cache.should_receive(:[]).with(@get.hash).and_return(@ok_response)
+          @cache.should_receive(:[]).with(@get.uri.to_s).and_return(@ok_response)
 
           @get.should_receive(:build_request_without_cache_store).with("if-modified-since" => @ok_response.headers["last-modified"]).and_return(@direct_get)
           @direct_get.should_receive(:invoke).and_return(@ok_response)
@@ -109,7 +109,7 @@ describe Wrest::CacheProxy do
           response_with_etag.should_receive(:expired?).and_return(true)
           response_with_etag.can_be_validated?.should == true
 
-          @cache.should_receive(:[]).with(@get.hash).and_return(response_with_etag)
+          @cache.should_receive(:[]).with(@get.uri.to_s).and_return(response_with_etag)
 
           @get.should_receive(:build_request_without_cache_store).with("if-none-match" => "123").and_return(@direct_get)
           @direct_get.should_receive(:invoke).and_return(response_with_etag)
@@ -127,8 +127,8 @@ describe Wrest::CacheProxy do
         # 304 is Not Modified
         it "should use the cached response if the server returns 304" do
           not_modified_response = @ok_response.clone
-          not_modified_response.stub(:code).and_return('304')
-          @cache.should_receive(:[]).with(@get.hash).and_return(@cached_response)
+          not_modified_response.should_receive(:code).at_least(1).times.and_return('304')
+          @cache.should_receive(:[]).with(@get.uri.to_s).and_return(@cached_response)
 
           @cache_proxy.should_receive(:send_validation_request_for).and_return(not_modified_response)
 
@@ -143,8 +143,8 @@ describe Wrest::CacheProxy do
           it "should call update_cache_headers" do
 
             not_modified_response = @ok_response.clone
-            not_modified_response.stub(:code).and_return('304')
-            @cache.should_receive(:[]).with(@get.hash).and_return(@cached_response)
+            not_modified_response.should_receive(:code).at_least(1).times.and_return('304')
+            @cache.should_receive(:[]).with(@get.uri.to_s).and_return(@cached_response)
 
             @cache_proxy.should_receive(:send_validation_request_for).and_return(not_modified_response)
             @cache_proxy.should_receive(:update_cache_headers_for).with(@cached_response, not_modified_response)
@@ -181,9 +181,9 @@ describe Wrest::CacheProxy do
 
         it "should use it if the server returns a new response" do
           new_response = Wrest::Native::Response.new(build_ok_response('', cacheable_headers()))
-          new_response.stub(:code).and_return('200')
+          new_response.should_receive(:code).at_least(1).times.and_return('200')
 
-          @cache.should_receive(:[]).with(@get.hash).and_return(@cached_response)
+          @cache.should_receive(:[]).with(@get.uri.to_s).and_return(@cached_response)
           @cache_proxy.should_receive(:send_validation_request_for).and_return(new_response)
 
           @cache_proxy.get.should == new_response
@@ -191,9 +191,9 @@ describe Wrest::CacheProxy do
 
         it "should also cache it when the server returns a new response" do
           new_response = Wrest::Native::Response.new(build_ok_response('', cacheable_headers()))
-          new_response.stub(:code).and_return('200')
+          new_response.should_receive(:code).at_least(1).times.and_return('200')
 
-          @cache.should_receive(:[]).with(@get.hash).and_return(@cached_response)
+          @cache.should_receive(:[]).with(@get.uri.to_s).and_return(@cached_response)
           @cache_proxy.should_receive(:send_validation_request_for).and_return(new_response)
           @cache.should_receive(:[]=).once
 
@@ -211,7 +211,7 @@ describe Wrest::CacheProxy do
     end
 
     it "should check whether a response is cacheable when trying to cache a response" do
-      @cache.should_receive(:[]).with(@get.hash).and_return(nil)
+      @cache.should_receive(:[]).with(@get.uri.to_s).and_return(nil)
       @get.should_receive(:invoke_without_cache_check).and_return(@ok_response)
       @ok_response.should_receive(:cacheable?).and_return(false)
       @cache_proxy.get
@@ -221,8 +221,35 @@ describe Wrest::CacheProxy do
       response = @ok_response
       response.cacheable?.should == true
       @get.should_receive(:invoke_without_cache_check).and_return(response)
-      @cache.should_receive(:[]=).with(@get.hash, response)
+      @cache.should_receive(:[]=).with(@get.uri.to_s, response)
       @cache_proxy.get
     end
   end
+
+  describe 'redis specific caching', functional: true do
+    before :all do
+      Wrest::Caching.enable_redis
+    end
+
+    before :each do
+      @redis_cache     = Wrest::Caching::Redis.new
+      @request_uri = 'http://localhost:3000/query_based_response'.to_uri
+      query_params_one = {name: 'Example', age: 21}
+      query_params_two = {height: 174, units: 'cm'}
+      @get_one         = Wrest::Native::Get.new(@request_uri, query_params_one, {}, {:cache_store => @redis_cache})
+      @get_two         = Wrest::Native::Get.new(@request_uri, query_params_two, {}, {:cache_store => @redis_cache})
+    end
+
+    after :each do
+      @redis_cache.delete(@get_one)
+      @redis_cache.delete(@get_two)
+    end
+
+    it 'should have different responses for get request with same scheme, authority, paths but different query params, given that response changes with query params' do
+      @cache_proxy_one = Wrest::CacheProxy.new(@get_one, @redis_cache)
+      @cache_proxy_two = Wrest::CacheProxy.new(@get_two, @redis_cache)
+      expect(@cache_proxy_one.get).to_not eq(@cache_proxy_two.get)
+    end
+  end
+
 end

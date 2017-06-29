@@ -27,6 +27,15 @@ module Wrest
         clone(:cache_store => Wrest::Caching::Memcached.new)
       end
 
+      def using_redis
+        clone(:cache_store => Wrest::Caching::Redis.new)
+      end
+
+      # Returns a Uri object that uses bounded hash for caching responses.
+      def using_bounded_hash
+        clone(:cache_store => Wrest::Caching::BoundedHash.new)
+      end
+
       # Disables using the globally configured cache for GET requests 
       # made using the Uri returned by this method.
       def disable_cache

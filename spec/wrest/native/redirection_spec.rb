@@ -29,14 +29,14 @@ describe Wrest::Native::Redirection do
     request_url = 'http://redirect.com'
 
     response = double(Net::HTTPRedirection)
-    response.stub(:code).and_return('301')
-    response.stub(:message).and_return('')
-    response.stub(:body).and_return('')
-    response.stub(:to_hash).and_return('location' => request_url)
+    allow(response).to receive(:code).and_return('301')
+    allow(response).to receive(:message).and_return('')
+    allow(response).to receive(:body).and_return('')
+    allow(response).to receive(:to_hash).and_return('location' => request_url)
 
     http_connection = double(Net::HTTP)
-    http_connection.stub(:read_timeout=)
-    http_connection.stub(:set_debug_output)
+    allow(http_connection).to receive(:read_timeout=)
+    allow(http_connection).to receive(:set_debug_output)
     http_connection.should_receive(:request).exactly(5).times.and_return(response)
 
     Net::HTTP.should_receive(:new).exactly(5).times.and_return(http_connection)

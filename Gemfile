@@ -1,19 +1,12 @@
 source "http://rubygems.org"
 
-# gem 'hanna'
-gem 'rubyforge'
-gem 'simplecov', :platforms => :mri_20
 gem 'rake', '~> 10'
+gem 'rspec-collection_matchers', '~> 1.1'
+gem 'rdoc', '~> 4.2'
+gem 'simplecov', :platforms => :mri_19
 
 group :multipart_support do
-  gem 'multipart-post', '~> 1'
-end
-
-group :libcurl_support do
-  # 1.8.7, 1.9.2, rbx
-  platforms :ruby do
-    gem 'patron', '~> 0.4'
-  end
+  gem 'multipart-post', '~> 2'
 end
 
 group :nokogiri do
@@ -22,22 +15,20 @@ end
 
 group :libxml do
   platforms :ruby do
-    gem 'libxml-ruby' unless Object.const_defined?('RUBY_ENGINE') && RUBY_ENGINE =~ /rbx/
-  end
-end
-
-group :jrexml do
-  platforms :jruby do
-    gem 'jrexml', '~> 0.5.3'
+    gem 'libxml-ruby', '~> 2.8.0' unless Object.const_defined?('RUBY_ENGINE') && RUBY_ENGINE =~ /rbx/
   end
 end
 
 group :memcached_support do
-  gem 'dalli', '~> 1.0.1'
+  gem 'dalli', '~> 2'
+end
+
+group :redis_support do
+  gem 'redis', '~> 3'
 end
 
 group :eventmachine_support do
-  gem 'eventmachine', '~> 0.12.10'
+  gem 'eventmachine', '~> 1.0.7'
 end
 
 gemspec

@@ -55,35 +55,35 @@ module Wrest
 
     it "should build a Redirection instead of a normal response if the code is 301..303 or 305..3xx" do
       http_response = double(Net::HTTPRedirection)
-      http_response.stub(:code).and_return('301')
+      allow(http_response).to receive(:code).and_return('301')
 
       Native::Response.new(http_response).class.should == Wrest::Native::Redirection
     end
 
     it "should build a normal response if the code is 304" do
       http_response = double(Net::HTTPRedirection)
-      http_response.stub(:code).and_return('304')
+      allow(http_response).to receive(:code).and_return('304')
 
       Native::Response.new(http_response).class.should == Wrest::Native::Response
     end
 
     it "should build a normal Response for non 3xx codes" do
       http_response = double(Net::HTTPResponse)
-      http_response.stub(:code).and_return('200')
+      allow(http_response).to receive(:code).and_return('200')
 
       Native::Response.new(http_response).class.should == Wrest::Native::Response
     end
 
     it "should know how to delegate to a translator" do
       http_response = double('response')
-      http_response.stub(:code).and_return('200')
+      allow(http_response).to receive(:code).and_return('200')
       Components::Translators::Xml.should_receive(:deserialise).with(http_response,{})
       Native::Response.new(http_response).deserialise_using(Components::Translators::Xml)
     end
 
     it "should know how to load a translator based on content type" do
       http_response = double('response')
-      http_response.stub(:code).and_return('422')
+      allow(http_response).to receive(:code).and_return('422')
       http_response.should_receive(:content_type).and_return('application/xml')
 
       response = Native::Response.new(http_response)
@@ -94,7 +94,7 @@ module Wrest
 
     it "should know how to deserialise a json response" do
       http_response = double('response')
-      http_response.stub(:code).and_return('200')
+      allow(http_response).to receive(:code).and_return('200')
       http_response.should_receive(:body).and_return("{ \"menu\": \"File\",
       \"commands\": [ { \"title\": \"New\", \"action\":\"CreateDoc\" }, {
       \"title\": \"Open\", \"action\": \"OpenDoc\" }, { \"title\": \"Close\",
@@ -112,10 +112,10 @@ module Wrest
 
     it "should simply return itself when asked to follow (null object behaviour - see MovedPermanently for more context)" do
       http_response = double('response')
-      http_response.stub(:code).and_return('422')
+      allow(http_response).to receive(:code).and_return('422')
 
       response = Native::Response.new(http_response)
-      response.follow.equal?(response).should be_true
+      response.follow.equal?(response).should be_truthy
     end
 
     describe 'Keep-Alive' do
@@ -142,7 +142,7 @@ module Wrest
           # the cacheable codes are enumerated in Firefox source code: nsHttpResponseHead.cpp::MustValidate
           http_response = build_ok_response('', cacheable_headers)
           ['200', '203', '300', '301'].each do |code|
-            http_response.stub(:code).and_return(code)
+            allow(http_response).to receive(:code).and_return(code)
             response = Native::Response.new(http_response)
             response.should be_cacheable
           end
@@ -184,7 +184,7 @@ module Wrest
         it "should say its not cacheable if the response code is not range of 200-299" do
           http_response = build_ok_response('', cacheable_headers)
           ['100', '206', '400', '401', '500'].each do |code|
-            http_response.stub(:code).and_return(code)
+            allow(http_response).to receive(:code).and_return(code)
             response = Native::Response.new(http_response)
             response.cacheable?.should == false
           end
@@ -231,9 +231,14 @@ module Wrest
           response.cacheable?.should == false
         end
 
-        it "should not be cacheable for response with an undeterminable vary tag" do
-          response = Native::Response.new(build_ok_response('', cacheable_headers.merge('vary' => ['*'])))
-          response.cacheable?.should == false
+        it 'should be cacheable if vary header is set' do
+          response = Native::Response.new(build_ok_response('', cacheable_headers.merge('vary' => 'Accept-Encoding')))
+          expect(response.cacheable?).to eq(true)
+        end
+
+        it 'should not be cacheable if vary header is *' do
+          response = Native::Response.new(build_ok_response('', cacheable_headers.merge('vary' => '*')))
+          expect(response.cacheable?).to eq(false)
         end
       end
 
@@ -244,10 +249,10 @@ module Wrest
 
         it "should return correct values for code_cacheable?" do
           http_response = build_ok_response('', cacheable_headers)
-          http_response.stub(:code).and_return('300')
+          allow(http_response).to receive(:code).and_return('300')
           Native::Response.new(http_response).code_cacheable?.should == true
 
-          http_response.stub(:code).and_return('500')
+          allow(http_response).to receive(:code).and_return('500')
           Native::Response.new(http_response).code_cacheable?.should == false
         end
 
@@ -281,14 +286,6 @@ module Wrest
 
           http_response = build_ok_response('', cacheable_headers.merge("pragma" => "no-cache "))
           Native::Response.new(http_response).pragma_nocache_not_set?.should == false
-        end
-
-        it "should return correct values for vary" do
-          http_response = build_ok_response
-          Native::Response.new(http_response).vary_tag_determinable?.should == true
-
-          http_response = build_ok_response('', cacheable_headers.merge("vary" => "*"))
-          Native::Response.new(http_response).vary_tag_determinable?.should == false
         end
 
         it "should return correct values for response_date" do
