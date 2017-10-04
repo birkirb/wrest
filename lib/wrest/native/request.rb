@@ -102,6 +102,26 @@ module Wrest::Native
     end
 
     #:nodoc:
+    def invoke_without_cache_check
+      response = nil
+      @connection ||= @uri.create_connection(:timeout => timeout, :verify_mode => verify_mode, :ca_path => ca_path)
+      @connection.set_debug_output @detailed_http_logging
+      http_request.basic_auth username, password unless username.nil? || password.nil?
+
+      prefix = "#{http_request.method} #{self.hash} #{@connection.hash} #{Thread.current.object_id}"
+
+      Wrest.logger.debug "<- (#{prefix}) #{@uri.protocol}://#{@uri.host}:#{@uri.port}#{@http_request.path}"
+      Wrest.logger.debug "<- Body: #{@body}"
+      time = Benchmark.realtime { response = Wrest::Native::Response.new( do_request ) }
+
+      execute_callback_if_any(response)
+
+      @follow_redirects ? response.follow(@options.merge(request_uri: @uri)) : response
+    rescue Timeout::Error => e
+      raise Wrest::Exceptions::Timeout.new(e)
+    end
+
+    #:nodoc:
     def build_request(request_klass, uri, parameters, headers)
       if(!uri.query.empty?)
         request_klass.new(parameters.empty? ? "#{uri.uri_path}?#{uri.query}" : "#{uri.uri_path}?#{uri.query}&#{parameters.to_query}", headers)

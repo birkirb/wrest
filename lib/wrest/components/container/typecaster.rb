@@ -23,8 +23,7 @@ module Wrest
     module Typecaster
       def self.included(klass) #:nodoc:
         klass.extend Typecaster::ClassMethods
-        klass.class_eval{ include Typecaster::InstanceMethods }
-        klass.alias_method_chain  :initialize,  :typecasting
+        klass.class_eval{ prepend Typecaster::InstanceMethods }
       end
 
       module Helpers
@@ -115,8 +114,8 @@ module Wrest
       end
 
       module InstanceMethods # :nodoc:
-        def initialize_with_typecasting(attributes = {}) # :nodoc:
-          initialize_without_typecasting(attributes)
+        def initialize(attributes = {})
+          super(attributes)
           self.class.typecast_map.each do |key, typecaster|
             value = @attributes[key]
             @attributes[key] = typecaster.call(value) if (value.is_a?(String) || value.is_a?(Hash) || value.is_a?(Array) || value.is_a?(Fixnum))
