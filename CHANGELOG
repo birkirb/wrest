@@ -2,6 +2,15 @@ Features under the section marked 'Current' are completed but pending release as
 
 Features under a numbered section are complete and available in the Wrest gem.
 
+== 2.2.0
+ * Add support for HTTP PATCH [Aditi Raveesh]
+
+== 2.1.9
+ * Switch to using concurrent-ruby
+
+== 2.1.6
+ * Logging payload by default
+
 == 2.1.4
  * Making cache keys include query params
 
