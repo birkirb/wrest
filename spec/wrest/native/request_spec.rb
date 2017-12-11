@@ -11,29 +11,29 @@ require "spec_helper"
 
 describe Wrest::Native::Request do
   it "should convert all symbols in header keys to strings" do
-    Wrest::Native::Request.new(
+    expect(Wrest::Native::Request.new(
                 'http://localhost/foo'.to_uri, Net::HTTP::Get, {},
                 nil, 'Content-Type' => 'application/xml', :per_page => '10'
-                ).headers.should == {
+                ).headers).to eq({
                   'Content-Type' => 'application/xml',
                   'per_page' => '10'
-                }
+                })
   end
 
   it "should default the 'follow_redirects' option to true for a Get" do
-    Wrest::Native::Get.new('http://localhost/foo'.to_uri).follow_redirects.should be_true
+    expect(Wrest::Native::Get.new('http://localhost/foo'.to_uri).follow_redirects).to be_truthy
   end
 
   it "should default the 'follow_redirects_count' option to 0" do
-    Wrest::Native::Get.new('http://localhost/foo'.to_uri).follow_redirects_count.should == 0
+    expect(Wrest::Native::Get.new('http://localhost/foo'.to_uri).follow_redirects_count).to eq(0)
   end
 
   it "should default the 'follow_redirects_limit' option to 5" do
-    Wrest::Native::Get.new('http://localhost/foo'.to_uri).follow_redirects_limit.should == 5
+    expect(Wrest::Native::Get.new('http://localhost/foo'.to_uri).follow_redirects_limit).to eq(5)
   end
 
   it "should allow Gets to disable redirect follows" do
-    Wrest::Native::Get.new('http://localhost/foo'.to_uri, {}, {}, {:follow_redirects => false}).follow_redirects.should be_false
+    expect(Wrest::Native::Get.new('http://localhost/foo'.to_uri, {}, {}, {:follow_redirects => false}).follow_redirects).to be_falsey
   end
 
   it "should increment the follow_redirects_count for every redirect leving the count unaffected in previous requests" do
@@ -43,34 +43,34 @@ describe Wrest::Native::Request do
     redirected_request = double('Request to http://coathangers.com')
 
     double_connection = double('Http Connection')
-    uri.stub(:create_connection).and_return(double_connection)
+    allow(uri).to receive(:create_connection).and_return(double_connection)
 
     raw_response = double(Net::HTTPRedirection)
-    raw_response.stub(:code).and_return('301')
-    raw_response.stub(:message).and_return('')
-    raw_response.stub(:body).and_return('')
+    allow(raw_response).to receive(:code).and_return('301')
+    allow(raw_response).to receive(:message).and_return('')
+    allow(raw_response).to receive(:body).and_return('')
 
     response = Wrest::Native::Redirection.new(raw_response)
-    response.stub(:[]).with('location').and_return(redirect_location)
+    allow(response).to receive(:[]).with('location').and_return(redirect_location)
 
-    double_connection.should_receive(:request).and_return(raw_response)
-    double_connection.should_receive(:set_debug_output)
+    expect(double_connection).to receive(:request).and_return(raw_response)
+    expect(double_connection).to receive(:set_debug_output)
 
-    Wrest::Native::Response.should_receive(:new).and_return(response)
-    redirected_request.stub(:get)
-    Wrest::Uri.should_receive(:new).with(redirect_location, hash_including(:follow_redirects_count=>1)).and_return(redirected_request)
+    expect(Wrest::Native::Response).to receive(:new).and_return(response)
+    allow(redirected_request).to receive(:get)
+    expect(Wrest::Uri).to receive(:new).with(redirect_location, hash_including(:follow_redirects_count=>1)).and_return(redirected_request)
 
     request.invoke
-    request.follow_redirects_count.should == 0
+    expect(request.follow_redirects_count).to eq(0)
   end
 
   it "should not set basic authentication for request if either of username or password is nil" do
     uri = 'http://localhost/foo'.to_uri
     request = Wrest::Native::Get.new(uri)
     http_request = double(Net::HTTP::Get, :method => "GET", :hash => {})
-    http_request.should_not_receive(:basic_auth)
-    request.stub(:http_request).and_return(http_request)
-    request.stub(:do_request).and_return(double(Net::HTTPOK, :code => "200", :message => 'OK', :body => '', :to_hash => {}))
+    expect(http_request).to_not receive(:basic_auth)
+    expect(request).to receive(:http_request).at_least(1).times.and_return(http_request)
+    expect(request).to receive(:do_request).and_return(double(Net::HTTPOK, :code => "200", :message => 'OK', :body => '', :to_hash => {}))
     request.invoke
   end
 
@@ -78,16 +78,16 @@ describe Wrest::Native::Request do
     uri = 'http://localhost/foo'.to_uri
     request = Wrest::Native::Get.new(uri, {}, {}, {:username => "name", :password => "password"})
     http_request = double(Net::HTTP::Get, :method => "GET", :hash => {})
-    http_request.should_receive(:basic_auth).with('name', 'password')
-    request.stub(:http_request).and_return(http_request)
-    request.stub(:do_request).and_return(double(Net::HTTPOK, :code => "200", :message => 'OK', :body => '', :to_hash => {}))
+    expect(http_request).to receive(:basic_auth).with('name', 'password')
+    expect(request).to receive(:http_request).at_least(1).times.and_return(http_request)
+    expect(request).to receive(:do_request).and_return(double(Net::HTTPOK, :code => "200", :message => 'OK', :body => '', :to_hash => {}))
     request.invoke
   end
 
   it "should default the 'follow_redirects' option to false for a Post, Put or Delete" do
-    Wrest::Native::Post.new('http://localhost/foo'.to_uri).follow_redirects.should_not be_true
-    Wrest::Native::Put.new('http://localhost/foo'.to_uri).follow_redirects.should_not be_true
-    Wrest::Native::Delete.new('http://localhost/foo'.to_uri).follow_redirects.should_not be_true
+    Wrest::Native::Post.new('http://localhost/foo'.to_uri).follow_redirects.should_not be_truthy
+    Wrest::Native::Put.new('http://localhost/foo'.to_uri).follow_redirects.should_not be_truthy
+    Wrest::Native::Delete.new('http://localhost/foo'.to_uri).follow_redirects.should_not be_truthy
   end
 
   context "SSL options" do
@@ -95,8 +95,8 @@ describe Wrest::Native::Request do
     let(:http_request){ double(Net::HTTP::Get, :method => "GET") }
     def setup_request_expectations(request)
       request.tap do |r|
-        request.stub(:http_request).and_return(http_request)
-        request.stub(:do_request).and_return(double(Net::HTTPOK, :code => "200", :message => 'OK', :body => '', :to_hash => {}))
+        expect(request).to receive(:http_request).at_least(1).times.and_return(http_request)
+        expect(request).to receive(:do_request).and_return(double(Net::HTTPOK, :code => "200", :message => 'OK', :body => '', :to_hash => {}))
       end
     end
 
@@ -125,7 +125,7 @@ describe Wrest::Native::Request do
   it "should not store response in cache if the original request was not GET" do
     cache = {}
     post = Wrest::Native::Post.new("http://localhost".to_uri, {}, {}, cacheable_headers, {:cache_store => cache})
-    post.should_receive(:do_request).and_return(double(Net::HTTPOK, :code => "200", :message => 'OK', :body => '', :to_hash => {}))
+    expect(post).to receive(:do_request).and_return(double(Net::HTTPOK, :code => "200", :message => 'OK', :body => '', :to_hash => {}))
 
     cache.should_not_receive(:[])
     post.invoke
@@ -166,8 +166,8 @@ describe Wrest::Native::Request do
 
     it "should correctly use the detailed_http_logging option" do
       logger = double(Logger)
-      logger.should_receive(:<<).at_least(:once).with {|detailed_log| detailed_log.include? "opening connection to"}
-      logger.stub(:<<)
+      logger.should_receive(:<<).at_least(:once).with(/opening connection to/)
+      logger.should_receive(:<<).at_least(1).times
 
       uri = "http://localhost:3000/glassware".to_uri :detailed_http_logging => logger
 

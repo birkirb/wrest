@@ -14,7 +14,7 @@ module Wrest::AsyncRequest
         async_obj = ThreadBackend.new
         async_obj.execute(request)
         sleep 1
-        hash.key?("success").should be_true
+        hash.key?("success").should be_truthy
       end
     end
   end

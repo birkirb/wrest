@@ -6,6 +6,7 @@ Wrest::Caching.enable_memcached
 describe Wrest::Caching do
   context "functional", :functional => true do
     before :each do
+
       @memcached = Wrest::Caching::Memcached.new
       @memcached["abc"]="xyz"
     end
@@ -15,6 +16,7 @@ describe Wrest::Caching do
         Dalli::Client.should_receive(:new).with(nil, {})
         client = Wrest::Caching::Memcached.new
       end
+      
       it "should always default the options to an empty hash" do
         Dalli::Client.should_receive(:new).with(nil, {})
         client = Wrest::Caching::Memcached.new
@@ -22,18 +24,18 @@ describe Wrest::Caching do
     end
 
     it "should know how to retrieve a cache entry" do
-      @memcached["abc"].should =="xyz"
+      expect(@memcached["abc"]).to eq("xyz")
     end
 
     it "should know how to update a cache entry" do
       @memcached["abc"] = "123"
-      @memcached["abc"].should == "123"
+      expect(@memcached["abc"]).to eq("123")
     end
 
     it "should know how to delete a cache entry" do
       @memcached.delete("abc").should == "xyz"
-      @memcached["abc"].should be_nil
+      expect(@memcached["abc"]).to eq(nil)
     end
   end
-
 end
+

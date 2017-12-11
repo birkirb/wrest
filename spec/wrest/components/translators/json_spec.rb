@@ -40,17 +40,17 @@ module Wrest::Components::Translators
             "action"=>"OpenDoc"},
             {"title"=>"Close", "action"=>"CloseDoc"}
       ]}
-      Json.serialise(hash).should include("\"menu\":\"File\"")
-      Json.serialise(hash).should include("\"commands\":[{\"title\":\"New\",\"action\":\"CreateDoc\"},{\"title\":\"Open\",\"action\":\"OpenDoc\"},{\"title\":\"Close\",\"action\":\"CloseDoc\"}]")
+      expect(Json.serialise(hash)).to include("\"menu\":\"File\"")
+      expect(Json.serialise(hash)).to include("\"commands\":[{\"title\":\"New\",\"action\":\"CreateDoc\"},{\"title\":\"Open\",\"action\":\"OpenDoc\"},{\"title\":\"Close\",\"action\":\"CloseDoc\"}]")
     end
 
     it "has #deserialize delegate to #deserialise" do
-      Json.should_receive(:deserialise).with(http_response, :option => :something)
+      expect(Json).to receive(:deserialise).with(http_response, :option => :something)
       Json.deserialize(http_response, :option => :something)
     end
 
     it "has #serialize delegate to #serialise" do
-      Json.should_receive(:serialise).with({ :hash => :foo }, :option => :something)
+      expect(Json).to receive(:serialise).with({ :hash => :foo }, :option => :something)
       Json.serialize({:hash => :foo}, :option => :something)
     end
   end
