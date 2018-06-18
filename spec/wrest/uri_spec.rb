@@ -108,10 +108,6 @@ module Wrest
       Uri.new('http://foo:bar@localhost:3000').to_s.should == 'http://foo:bar@localhost:3000'
     end
 
-    it "should escape query parameters" do
-      Uri.new('http://localhost:3000/search?q=stuff to search for&bar=something').full_path.should == '/search?q=stuff%20to%20search%20for&bar=something'
-    end
-
     describe 'Equals' do
       it "should understand equality" do
         Uri.new('https://localhost:3000/ooga').should_not == nil
