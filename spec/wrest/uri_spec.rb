@@ -365,9 +365,9 @@ module Wrest
           request = Net::HTTP::Delete.new('/glassware?owner=Kai&type=bottle', {'page' => '2', 'per_page' => '5'})
           Net::HTTP::Delete.should_receive(:new).with('/glassware?owner=Kai&type=bottle', {'page' => '2', 'per_page' => '5'}).and_return(request)
 
-          http.should_receive(:request).with(request, nil).and_return(build_ok_response(nil))
+          http.should_receive(:request).with(request, '').and_return(build_ok_response(nil))
 
-          uri.delete(build_ordered_hash([[:owner, 'Kai'],[:type, 'bottle']]), :page => '2', :per_page => '5')
+          uri.delete('', { :page => '2', :per_page => '5' }, build_ordered_hash([[:owner, 'Kai'],[:type, 'bottle']]))
         end
 
         context "query parameters" do
@@ -379,9 +379,9 @@ module Wrest
             request = Net::HTTP::Delete.new('/glassware?owner=Kai&type=bottle', {'page' => '2', 'per_page' => '5'})
             Net::HTTP::Delete.should_receive(:new).with('/glassware?owner=Kai&type=bottle', {'page' => '2', 'per_page' => '5'}).and_return(request)
 
-            http.should_receive(:request).with(request, nil).and_return(build_ok_response(nil))
+            http.should_receive(:request).with(request, '').and_return(build_ok_response(nil))
 
-            uri.delete({}, :page => '2', :per_page => '5')
+            uri.delete('', {:page => '2', :per_page => '5'})
           end
 
           it "should know how to delete with a ? appended to the uri and no appended parameters" do
@@ -392,10 +392,9 @@ module Wrest
             request = Net::HTTP::Delete.new('/glassware', {'page' => '2', 'per_page' => '5'})
             Net::HTTP::Delete.should_receive(:new).with('/glassware', {'page' => '2', 'per_page' => '5'}).and_return(request)
 
-            http.should_receive(:request).with(request, nil).and_return(build_ok_response(nil))
+            http.should_receive(:request).with(request, '').and_return(build_ok_response(nil))
 
-            uri.delete({}, :page => '2', :per_page => '5')
-
+            uri.delete('', {:page => '2', :per_page => '5'})
           end
 
           it "should know how to delete with a ? appended to the uri and specified parameters" do
@@ -408,10 +407,9 @@ module Wrest
             Net::HTTP::Delete.should_receive(:new).with('/glassware?owner=Kai&type=bottle', {'page' => '2', 'per_page' => '5'}).and_return(request)
 
 
-            http.should_receive(:request).with(request, nil).and_return(build_ok_response(nil))
+            http.should_receive(:request).with(request, '').and_return(build_ok_response(nil))
 
-            uri.delete(build_ordered_hash([[:owner, 'Kai'],[:type, 'bottle']]), :page => '2', :per_page => '5')
-
+            uri.delete('', { :page => '2', :per_page => '5' }, build_ordered_hash([[:owner, 'Kai'],[:type, 'bottle']]))
           end
 
           it "should know how to delete with parameters appended to the uri and specfied parameters" do
@@ -423,9 +421,9 @@ module Wrest
 
             Net::HTTP::Delete.should_receive(:new).with('/glassware?owner=kai&type=bottle&param1=one&param2=two', {'page' => '2', 'per_page' => '5'}).and_return(request)
 
-            http.should_receive(:request).with(request, nil).and_return(build_ok_response(nil))
+            http.should_receive(:request).with(request, '').and_return(build_ok_response(nil))
 
-            uri.delete(build_ordered_hash([[:param1, 'one'],[:param2, 'two']]), :page => '2', :per_page => '5')
+            uri.delete('', {:page => '2', :per_page => '5'}, build_ordered_hash([[:param1, 'one'],[:param2, 'two']]))
           end
         end
       end
